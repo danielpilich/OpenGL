@@ -83,7 +83,7 @@ namespace PMLabs
 
         public static void DrawScene(Window window, float angle_x, float angle_y)
         {
-            string path = "sphere.obj";
+            string path = "../../../sphere.obj";
 
             List<float> vertices = new List<float>();
             List<float> vertexNormals = new List<float>();
