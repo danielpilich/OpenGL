@@ -1,9 +1,14 @@
 ﻿using GLFW;
 using GlmSharp;
+
+using Shaders;
+using Models;
+
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
-using Shaders;
+
 using System.Drawing;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PMLabs
 {
@@ -18,11 +23,16 @@ namespace PMLabs
 
     class Program
     {
+
         static ShaderProgram shader;
         static float speed_y;
         static float speed_x;
 
+        static int tex;
+        static int tex2;
+
         static KeyCallback kc = KeyProcessor;
+
         public static void KeyProcessor(System.IntPtr window, Keys key, int scanCode, InputState state, ModifierKeys mods)
         {
             if (state == InputState.Press)
@@ -45,8 +55,13 @@ namespace PMLabs
         {
             GL.ClearColor(0, 0, 0, 1);
             shader = new ShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
+
+            // Textures generated using LeonardoAI
+            tex = ReadTexture("earth.jpg", TextureUnit.Texture0);
+            tex2 = ReadTexture("earthLight.jpg", TextureUnit.Texture1);
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
+
         }
 
         public static void FreeOpenGLProgram(Window window)
@@ -55,7 +70,7 @@ namespace PMLabs
         }
 
         //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
-        public static int ReadTexture(string filename, TextureUnit textureUnit = TextureUnit.Texture0)
+        public static int ReadTexture(string filename, TextureUnit textureUnit)
         {
             var tex = GL.GenTexture();
             GL.ActiveTexture(textureUnit);
@@ -81,122 +96,54 @@ namespace PMLabs
             return tex;
         }
 
-        public static void DrawScene(Window window, float angle_x, float angle_y)
+        public static void DrawScene(Window window, float angle_x, float angle_y, float selfRotationAngle)
         {
-            string path = "../../../sphere.obj";
-
-            List<float> vertices = new List<float>();
-            List<float> vertexNormals = new List<float>();
-            List<float> texCoords = new List<float>();
-            List<int> vertexIndices = new List<int>();
-            List<int> normalIndices = new List<int>();
-            List<int> texCoordIndices = new List<int>();
-
-            using (StreamReader reader = new StreamReader(path))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.StartsWith("v "))
-                    {
-                        var parts = line.Split(' ');
-                        vertices.Add(float.Parse(parts[1])); // x
-                        vertices.Add(float.Parse(parts[2])); // y
-                        vertices.Add(float.Parse(parts[3])); // z
-                        vertices.Add(1.0f);
-                    }
-                    else if (line.StartsWith("vn "))
-                    {
-                        var parts = line.Split(' ');
-                        vertexNormals.Add(float.Parse(parts[1])); // x
-                        vertexNormals.Add(float.Parse(parts[2])); // y
-                        vertexNormals.Add(float.Parse(parts[3])); // z
-                        vertexNormals.Add(1.0f);
-                    }
-                    else if (line.StartsWith("vt "))
-                    {
-                        var parts = line.Split(' ');
-                        texCoords.Add(float.Parse(parts[1]));
-                        texCoords.Add(float.Parse(parts[2]));
-                    }
-                    else if (line.StartsWith("f "))
-                    {
-                        var parts = line.Split(' ');
-                        for (int i = 1; i < parts.Length; i++)
-                        {
-                            var indices = parts[i].Split('/');
-                            vertexIndices.Add(int.Parse(indices[0]) - 1);
-                            if (indices.Length > 1 && indices[1] != "")
-                                texCoordIndices.Add(int.Parse(indices[1]) - 1);
-                            if (indices.Length > 2 && indices[2] != "")
-                                normalIndices.Add(int.Parse(indices[2]) - 1);
-                        }
-                    }
-                }
-            }
-
-            List<float> finalVertices = new List<float>();
-            List<float> finalNormals = new List<float>();
-            List<float> finalTexCoords = new List<float>();
-
-            for (int i = 0; i < vertexIndices.Count; i++)
-            {
-                int vi = vertexIndices[i] * 4;
-                finalVertices.Add(vertices[vi]);
-                finalVertices.Add(vertices[vi + 1]);
-                finalVertices.Add(vertices[vi + 2]);
-                finalVertices.Add(vertices[vi + 3]);
-
-                if (normalIndices.Count > 0)
-                {
-                    int ni = normalIndices[i] * 4;
-                    finalNormals.Add(vertexNormals[ni]);
-                    finalNormals.Add(vertexNormals[ni + 1]);
-                    finalNormals.Add(vertexNormals[ni + 2]);
-                    finalNormals.Add(vertexNormals[ni + 3]);
-                }
-
-                if (texCoordIndices.Count > 0)
-                {
-                    int ti = texCoordIndices[i] * 2;
-                    finalTexCoords.Add(texCoords[ti]);
-                    finalTexCoords.Add(texCoords[ti + 1]);
-                }
-            }
-
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             mat4 P = mat4.Perspective(glm.Radians(50.0f), 1, 1, 50);
-            mat4 V = mat4.LookAt(new vec3(0, 0, -3), new vec3(0, 0, 0), new vec3(0, 1, 0));
+            mat4 V = mat4.LookAt(new vec3(0, 0, -5), new vec3(0, 0, 0), new vec3(0, 1, 0)) *
+                 mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
+                 mat4.Rotate(angle_x, new vec3(1, 0, 0));
 
             shader.Use();
             GL.UniformMatrix4(shader.U("P"), 1, false, P.Values1D);
             GL.UniformMatrix4(shader.U("V"), 1, false, V.Values1D);
 
-            mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) * mat4.Rotate(angle_x, new vec3(1, 0, 0));
+            // Nachylenie osi obrotu
+            vec3 inclinedAxis = new vec3(1, 1, 0).Normalized;
+
+            mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
+                     mat4.Rotate(angle_x, new vec3(1, 0, 0)) *
+                     mat4.Rotate(selfRotationAngle, inclinedAxis);
+
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
+
+            GL.Uniform1(shader.U("tex"), 0);
+            GL.Uniform1(shader.U("tex2"), 1);
 
             GL.EnableVertexAttribArray(shader.A("vertex"));
             GL.EnableVertexAttribArray(shader.A("normal"));
             GL.EnableVertexAttribArray(shader.A("texCoord"));
+            GL.EnableVertexAttribArray(shader.A("color"));
 
-            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, finalVertices.ToArray());
-            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, finalNormals.ToArray());
-            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, finalTexCoords.ToArray());
+            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertices);
+            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertexNormals);
+            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, MyCube.texCoords);
+            GL.VertexAttribPointer(shader.A("color"), 4, VertexAttribPointerType.Float, false, 0, MyCube.colors);
 
-            GL.DrawArrays(PrimitiveType.Lines, 0, finalVertices.Count / 4);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, MyCube.vertexCount);
 
             GL.DisableVertexAttribArray(shader.A("vertex"));
             GL.DisableVertexAttribArray(shader.A("normal"));
             GL.DisableVertexAttribArray(shader.A("texCoord"));
+            GL.DisableVertexAttribArray(shader.A("color"));
 
             Glfw.SwapBuffers(window);
         }
 
-
         static void Main(string[] args)
         {
-            Glfw.Init();//Zainicjuj bibliotekę GLFW
+            Glfw.Init(); // Zainicjuj bibliotekę GLFW
 
             Window window = Glfw.CreateWindow(500, 500, "OpenGL", GLFW.Monitor.None, Window.None);
 
@@ -207,6 +154,7 @@ namespace PMLabs
 
             float angle_x = 0;
             float angle_y = 0;
+            float selfRotationAngle = 0;
 
             InitOpenGLProgram(window);
 
@@ -214,20 +162,19 @@ namespace PMLabs
 
             while (!Glfw.WindowShouldClose(window))
             {
-                angle_x += speed_x * (float)Glfw.Time;
-                angle_y += speed_y * (float)Glfw.Time;
+                float time = (float)Glfw.Time;
+                angle_x += speed_x * time;
+                angle_y += speed_y * time;
+                selfRotationAngle += 1.0f * time; // Prędkość obrotu wokół nachylonej osi
                 Glfw.Time = 0;
-                DrawScene(window, angle_x, angle_y);
+                DrawScene(window, angle_x, angle_y, selfRotationAngle);
 
                 Glfw.PollEvents();
             }
-
 
             FreeOpenGLProgram(window);
 
             Glfw.Terminate();
         }
-
-
     }
 }
