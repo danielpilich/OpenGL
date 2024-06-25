@@ -151,21 +151,6 @@ namespace PMLabs
             GL.EnableVertexAttribArray(shader.A("normal"));
             GL.EnableVertexAttribArray(shader.A("texCoord"));
 
-            vertices = new List<float>();
-            vertexNormals = new List<float>();
-            texCoords = new List<float>();
-            vertices.Add(0.000000f);
-            vertices.Add(0.707107f);
-            vertices.Add(-0.707107f);
-            vertices.Add(1.0f);
-
-            vertexNormals.Add(0.0464f);
-            vertexNormals.Add(0.8810f);
-            vertexNormals.Add(-0.4709f);
-            vertexNormals.Add(0.0f);
-
-            texCoords.Add(0.750000f);
-            texCoords.Add(0.187500f);
 
             GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, vertices.ToArray());
             GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, vertexNormals.ToArray());
