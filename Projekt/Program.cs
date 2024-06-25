@@ -124,19 +124,16 @@ namespace PMLabs
             GL.EnableVertexAttribArray(shader.A("vertex"));
             GL.EnableVertexAttribArray(shader.A("normal"));
             GL.EnableVertexAttribArray(shader.A("texCoord"));
-            GL.EnableVertexAttribArray(shader.A("color"));
 
             GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertices);
             GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertexNormals);
             GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, MyCube.texCoords);
-            GL.VertexAttribPointer(shader.A("color"), 4, VertexAttribPointerType.Float, false, 0, MyCube.colors);
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, MyCube.vertexCount);
 
             GL.DisableVertexAttribArray(shader.A("vertex"));
             GL.DisableVertexAttribArray(shader.A("normal"));
             GL.DisableVertexAttribArray(shader.A("texCoord"));
-            GL.DisableVertexAttribArray(shader.A("color"));
 
             Glfw.SwapBuffers(window);
         }
