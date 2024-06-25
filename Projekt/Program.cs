@@ -22,6 +22,13 @@ namespace PMLabs
         static float speed_y;
         static float speed_x;
 
+        static List<float> vertices = new List<float>();
+        static List<float> vertexNormals = new List<float>();
+        static List<float> texCoords = new List<float>();
+        static List<int> vertexIndices = new List<int>();
+        static List<int> normalIndices = new List<int>();
+        static List<int> texCoordIndices = new List<int>();
+
         static KeyCallback kc = KeyProcessor;
         public static void KeyProcessor(System.IntPtr window, Keys key, int scanCode, InputState state, ModifierKeys mods)
         {
@@ -47,50 +54,8 @@ namespace PMLabs
             shader = new ShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
-        }
 
-        public static void FreeOpenGLProgram(Window window)
-        {
-
-        }
-
-        //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
-        public static int ReadTexture(string filename, TextureUnit textureUnit = TextureUnit.Texture0)
-        {
-            var tex = GL.GenTexture();
-            GL.ActiveTexture(textureUnit);
-            GL.BindTexture(TextureTarget.Texture2D, tex);
-
-            Bitmap bitmap = new Bitmap(filename);
-            System.Drawing.Imaging.BitmapData data = bitmap.LockBits(
-              new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-              System.Drawing.Imaging.ImageLockMode.ReadOnly,
-              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width,
-              data.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-
-            bitmap.UnlockBits(data);
-            bitmap.Dispose();
-
-            GL.TexParameter(TextureTarget.Texture2D,
-              TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D,
-              TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-
-            return tex;
-        }
-
-        public static void DrawScene(Window window, float angle_x, float angle_y)
-        {
             string path = "../../../sphere.obj";
-
-            List<float> vertices = new List<float>();
-            List<float> vertexNormals = new List<float>();
-            List<float> texCoords = new List<float>();
-            List<int> vertexIndices = new List<int>();
-            List<int> normalIndices = new List<int>();
-            List<int> texCoordIndices = new List<int>();
 
             using (StreamReader reader = new StreamReader(path))
             {
@@ -134,36 +99,42 @@ namespace PMLabs
                     }
                 }
             }
+        }
 
-            List<float> finalVertices = new List<float>();
-            List<float> finalNormals = new List<float>();
-            List<float> finalTexCoords = new List<float>();
+        public static void FreeOpenGLProgram(Window window)
+        {
 
-            for (int i = 0; i < vertexIndices.Count; i++)
-            {
-                int vi = vertexIndices[i] * 4;
-                finalVertices.Add(vertices[vi]);
-                finalVertices.Add(vertices[vi + 1]);
-                finalVertices.Add(vertices[vi + 2]);
-                finalVertices.Add(vertices[vi + 3]);
+        }
 
-                if (normalIndices.Count > 0)
-                {
-                    int ni = normalIndices[i] * 4;
-                    finalNormals.Add(vertexNormals[ni]);
-                    finalNormals.Add(vertexNormals[ni + 1]);
-                    finalNormals.Add(vertexNormals[ni + 2]);
-                    finalNormals.Add(vertexNormals[ni + 3]);
-                }
+        //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
+        public static int ReadTexture(string filename, TextureUnit textureUnit = TextureUnit.Texture0)
+        {
+            var tex = GL.GenTexture();
+            GL.ActiveTexture(textureUnit);
+            GL.BindTexture(TextureTarget.Texture2D, tex);
 
-                if (texCoordIndices.Count > 0)
-                {
-                    int ti = texCoordIndices[i] * 2;
-                    finalTexCoords.Add(texCoords[ti]);
-                    finalTexCoords.Add(texCoords[ti + 1]);
-                }
-            }
+            Bitmap bitmap = new Bitmap(filename);
+            System.Drawing.Imaging.BitmapData data = bitmap.LockBits(
+              new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+              System.Drawing.Imaging.ImageLockMode.ReadOnly,
+              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width,
+              data.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+
+            bitmap.UnlockBits(data);
+            bitmap.Dispose();
+
+            GL.TexParameter(TextureTarget.Texture2D,
+              TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D,
+              TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+
+            return tex;
+        }
+
+        public static void DrawScene(Window window, float angle_x, float angle_y)
+        {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             mat4 P = mat4.Perspective(glm.Radians(50.0f), 1, 1, 50);
@@ -180,11 +151,27 @@ namespace PMLabs
             GL.EnableVertexAttribArray(shader.A("normal"));
             GL.EnableVertexAttribArray(shader.A("texCoord"));
 
-            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, finalVertices.ToArray());
-            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, finalNormals.ToArray());
-            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, finalTexCoords.ToArray());
+            vertices = new List<float>();
+            vertexNormals = new List<float>();
+            texCoords = new List<float>();
+            vertices.Add(0.000000f);
+            vertices.Add(0.707107f);
+            vertices.Add(-0.707107f);
+            vertices.Add(1.0f);
 
-            GL.DrawArrays(PrimitiveType.Lines, 0, finalVertices.Count / 4);
+            vertexNormals.Add(0.0464f);
+            vertexNormals.Add(0.8810f);
+            vertexNormals.Add(-0.4709f);
+            vertexNormals.Add(0.0f);
+
+            texCoords.Add(0.750000f);
+            texCoords.Add(0.187500f);
+
+            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, vertices.ToArray());
+            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, vertexNormals.ToArray());
+            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, texCoords.ToArray());
+
+            GL.DrawArrays(PrimitiveType.Lines, 0, vertices.Count / 4);
 
             GL.DisableVertexAttribArray(shader.A("vertex"));
             GL.DisableVertexAttribArray(shader.A("normal"));
