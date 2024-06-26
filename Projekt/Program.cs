@@ -55,7 +55,7 @@ namespace PMLabs
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
-            string path = "../../../sphere.obj";
+            string path = "Models/sphere.obj";
 
             using (StreamReader reader = new StreamReader(path))
             {

@@ -22,6 +22,9 @@
     <None Update="glfw.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Models\sphere.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="vertex_shader.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
