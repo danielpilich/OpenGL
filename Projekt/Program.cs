@@ -55,10 +55,9 @@ namespace PMLabs
         {
             GL.ClearColor(0, 0, 0, 1);
             shader = new ShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
-
             // Textures generated using LeonardoAI
-            tex = ReadTexture("earth.jpg", TextureUnit.Texture0);
-            tex2 = ReadTexture("earthLight.jpg", TextureUnit.Texture1);
+            tex = ReadTexture("Texture/earth.jpg", TextureUnit.Texture0);
+            tex2 = ReadTexture("Texture/earthLight.jpg", TextureUnit.Texture1);
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
