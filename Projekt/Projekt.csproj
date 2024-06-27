@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<PackageReference Include="glfw-net" Version="3.3.1" />
 	<PackageReference Include="GlmSharp" Version="0.9.8" />
 	<PackageReference Include="OpenTK" Version="4.7.7" />
@@ -25,10 +31,6 @@
     <None Update="vertex_shader.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
