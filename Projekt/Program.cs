@@ -24,7 +24,8 @@ namespace PMLabs
         static float speed_y;
         static float speed_x;
 
-        static Sphere sphere = new Sphere();
+        static ObjLoader objLoader = new ObjLoader();
+        //static Sphere sphere = new Sphere();
 
         static KeyCallback kc = KeyProcessor;
 
@@ -53,6 +54,8 @@ namespace PMLabs
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
+            // Load the .obj file
+            objLoader.Load("Model/sphere.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
@@ -107,29 +110,27 @@ namespace PMLabs
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
 
-            //Kod rysujący. 
-            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, sphere.vertices);  //Powiąż dane z tablicy vertices z atrybutem 0
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, sphere.normals); //Powiąż dane z tablicy normals (wektory normalne ścian) z atrybutem 1
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, sphere.texCoords); //Powiąż dane z tablicy texCoords z atrybutem 2
+            // Bind the .obj data
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, sphere.vertexCount); //Rysuj model
+            GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 3);
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
 
-            //Wyłącz atrybuty o numerach 0-3.
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
             GL.DisableVertexAttribArray(2);
-
 
             Glfw.SwapBuffers(window);
         }
 
         static void Main(string[] args)
         {
-            Glfw.Init();//Zainicjuj bibliotekę GLFW
+            Glfw.Init();
 
             Window window = Glfw.CreateWindow(500, 500, "OpenGL", GLFW.Monitor.None, Window.None);
 
@@ -147,8 +148,8 @@ namespace PMLabs
 
             while (!Glfw.WindowShouldClose(window))
             {
-                angle_x += speed_x * (float)Glfw.Time; //Aktualizuj kat obrotu wokół osi X zgodnie z prędkością obrotu
-                angle_y += speed_y * (float)Glfw.Time; //Aktualizuj kat obrotu wokół osi Y zgodnie z prędkością obrotu
+                angle_x += speed_x * (float)Glfw.Time;
+                angle_y += speed_y * (float)Glfw.Time;
                 Glfw.Time = 0;
                 DrawScene(window, angle_x, angle_y);
 
