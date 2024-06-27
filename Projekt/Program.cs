@@ -106,20 +106,24 @@ namespace PMLabs
 
             GL.Uniform4(shader.U("color"), 0.1f, 0.1f, 0.9f, 1f);
 
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(0); // Vertices
+            GL.EnableVertexAttribArray(1); // Normals
+            GL.EnableVertexAttribArray(2); // TexCoords
 
-            // Bind the .obj data
+            // Bind the .obj data using indexed drawing
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
+
+            // Vertex positions
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
+
+            // Normals
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+
+            // Texture coordinates
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-
-            GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 3);
-
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            // Draw using indexed vertices
+            GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
 
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);

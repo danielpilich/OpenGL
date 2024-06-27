@@ -8,6 +8,9 @@ public class ObjLoader
     public List<float> Vertices { get; private set; } = new List<float>();
     public List<float> Normals { get; private set; } = new List<float>();
     public List<float> TexCoords { get; private set; } = new List<float>();
+    public List<int> VertexIndices { get; private set; } = new List<int>();
+    public List<int> NormalIndices { get; private set; } = new List<int>();
+    public List<int> TexCoordIndices { get; private set; } = new List<int>();
 
     public void Load(string path)
     {
@@ -35,6 +38,23 @@ public class ObjLoader
                     var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     TexCoords.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
                     TexCoords.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
+                }
+                else if (line.StartsWith("f "))
+                {
+                    var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 1; i < parts.Length; i++)
+                    {
+                        var indices = parts[i].Split('/');
+                        VertexIndices.Add(int.Parse(indices[0]) - 1);
+                        if (indices.Length > 1 && indices[1].Length > 0)
+                        {
+                            TexCoordIndices.Add(int.Parse(indices[1]) - 1);
+                        }
+                        if (indices.Length > 2 && indices[2].Length > 0)
+                        {
+                            NormalIndices.Add(int.Parse(indices[2]) - 1);
+                        }
+                    }
                 }
             }
         }
