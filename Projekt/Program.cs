@@ -4,6 +4,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Shaders;
 using System.Drawing;
+using System.Reflection;
 
 namespace PMLabs
 {
@@ -59,12 +60,13 @@ namespace PMLabs
             GL.Enable(EnableCap.DepthTest);
 
             // Load the .obj file
-            objLoader.Load("Models/sphere2.obj");
+            objLoader.Load("Models/sphere3.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
         {
-
+            GL.DeleteTexture(tex);
+            GL.DeleteTexture(tex2);
         }
 
         //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
@@ -110,37 +112,30 @@ namespace PMLabs
             // Nachylenie osi obrotu
             vec3 inclinedAxis = new vec3(1, 1, 0).Normalized;
 
-            mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
-                     mat4.Rotate(angle_x, new vec3(1, 0, 0)) *
-                     mat4.Rotate(selfRotationAngle, inclinedAxis);
+            mat4 M = mat4.Rotate(selfRotationAngle, inclinedAxis);
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
             GL.Uniform1(shader.U("tex"), 0);
             GL.Uniform1(shader.U("tex2"), 1);
 
             //Kula
-
-            GL.EnableVertexAttribArray(shader.A("vertex")); // Vertices
-            GL.EnableVertexAttribArray(shader.A("normal")); // Normals
-            GL.EnableVertexAttribArray(shader.A("texCoord")); // TexCoords
-
-            // Bind the .obj data using indexed drawing
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
+            GL.EnableVertexAttribArray(shader.A("vertex")); // TempVertices
+            GL.EnableVertexAttribArray(shader.A("normal")); // TempNormals
+            GL.EnableVertexAttribArray(shader.A("texCoord")); // TempTexCoords
 
             // Vertex positions
             GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
 
-            // Normals
+            // TempNormals
             GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
 
             // Texture coordinates
             GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
+
             // Draw using indexed vertices
-            GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
-
-
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 4);
+            //GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
+            GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count/4);
 
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
