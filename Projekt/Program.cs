@@ -137,9 +137,9 @@ namespace PMLabs
             //GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
             GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count/4);
 
-            GL.DisableVertexAttribArray(shader.A("vertex"));
-            GL.DisableVertexAttribArray(shader.A("normal"));
-            GL.DisableVertexAttribArray(shader.A("texCoord"));
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
 
             Glfw.SwapBuffers(window);
         }
