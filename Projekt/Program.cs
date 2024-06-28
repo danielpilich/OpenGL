@@ -18,7 +18,6 @@ namespace PMLabs
 
     class Program
     {
-
         static ShaderProgram shader;
         static float speed_y;
         static float speed_x;
@@ -135,6 +134,7 @@ namespace PMLabs
             Glfw.SwapBuffers(window);
         }
 
+
         static void Main(string[] args)
         {
             Glfw.Init();
@@ -145,6 +145,9 @@ namespace PMLabs
             Glfw.SwapInterval(1);
 
             GL.LoadBindings(new BC());
+
+            float angle_x = 0;
+            float angle_y = 0;
 
             InitOpenGLProgram(window);
 
