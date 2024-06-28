@@ -153,9 +153,6 @@ namespace PMLabs
 
             Glfw.Time = 0;
 
-            float angle_x = 0;
-            float angle_y = 0;
-
             while (!Glfw.WindowShouldClose(window))
             {
                 angle_x += speed_x * (float)Glfw.Time;
