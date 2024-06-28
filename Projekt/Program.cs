@@ -128,7 +128,7 @@ namespace PMLabs
             GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
 
             // TempNormals
-            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, objLoader.VertexNormals.ToArray());
+            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
 
             // Texture coordinates
             GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
