@@ -28,6 +28,8 @@ namespace PMLabs
         static float speed_y;
         static float speed_x;
 
+        static ObjLoader objLoader = new ObjLoader();
+
         static int tex;
         static int tex2;
 
@@ -61,6 +63,8 @@ namespace PMLabs
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
+            // Load the .obj file
+            objLoader.Load("Model/sphere2.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
@@ -114,11 +118,12 @@ namespace PMLabs
             mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
                      mat4.Rotate(angle_x, new vec3(1, 0, 0)) *
                      mat4.Rotate(selfRotationAngle, inclinedAxis);
-
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
             GL.Uniform1(shader.U("tex"), 0);
             GL.Uniform1(shader.U("tex2"), 1);
+
+            //Kwadrat
 
             GL.EnableVertexAttribArray(shader.A("vertex"));
             GL.EnableVertexAttribArray(shader.A("normal"));
@@ -133,6 +138,33 @@ namespace PMLabs
             GL.DisableVertexAttribArray(shader.A("vertex"));
             GL.DisableVertexAttribArray(shader.A("normal"));
             GL.DisableVertexAttribArray(shader.A("texCoord"));
+
+
+            //Kula
+
+            //GL.EnableVertexAttribArray(0); // Vertices
+            //GL.EnableVertexAttribArray(1); // Normals
+            //GL.EnableVertexAttribArray(2); // TexCoords
+
+            //// Bind the .obj data using indexed drawing
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
+
+            //// Vertex positions
+            //GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
+
+            //// Normals
+            //GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+
+            //// Texture coordinates
+            //GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
+
+            //// Draw using indexed vertices
+            //GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
+
+            //GL.DisableVertexAttribArray(0);
+            //GL.DisableVertexAttribArray(1);
+            //GL.DisableVertexAttribArray(2);
+
 
             Glfw.SwapBuffers(window);
         }
