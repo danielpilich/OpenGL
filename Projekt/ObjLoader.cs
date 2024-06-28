@@ -22,6 +22,7 @@ public class ObjLoader
                     Vertices.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
                     Vertices.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
                     Vertices.Add(float.Parse(parts[3], CultureInfo.InvariantCulture));
+                    Vertices.Add(1.0f);
                 }
                 else if (line.StartsWith("vn "))
                 {
@@ -29,6 +30,7 @@ public class ObjLoader
                     Normals.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
                     Normals.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
                     Normals.Add(float.Parse(parts[3], CultureInfo.InvariantCulture));
+                    Normals.Add(0.0f);
                 }
                 else if (line.StartsWith("vt "))
                 {

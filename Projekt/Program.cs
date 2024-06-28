@@ -125,45 +125,45 @@ namespace PMLabs
 
             //Kwadrat
 
-            GL.EnableVertexAttribArray(shader.A("vertex"));
-            GL.EnableVertexAttribArray(shader.A("normal"));
-            GL.EnableVertexAttribArray(shader.A("texCoord"));
+            //GL.EnableVertexAttribArray(shader.A("vertex"));
+            //GL.EnableVertexAttribArray(shader.A("normal"));
+            //GL.EnableVertexAttribArray(shader.A("texCoord"));
 
-            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertices);
-            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertexNormals);
-            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, MyCube.texCoords);
+            //GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertices);
+            //GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, MyCube.vertexNormals);
+            //GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, MyCube.texCoords);
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, MyCube.vertexCount);
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, MyCube.vertexCount);
 
-            GL.DisableVertexAttribArray(shader.A("vertex"));
-            GL.DisableVertexAttribArray(shader.A("normal"));
-            GL.DisableVertexAttribArray(shader.A("texCoord"));
+            //GL.DisableVertexAttribArray(shader.A("vertex"));
+            //GL.DisableVertexAttribArray(shader.A("normal"));
+            //GL.DisableVertexAttribArray(shader.A("texCoord"));
 
 
             //Kula
 
-            //GL.EnableVertexAttribArray(0); // Vertices
-            //GL.EnableVertexAttribArray(1); // Normals
-            //GL.EnableVertexAttribArray(2); // TexCoords
+            GL.EnableVertexAttribArray(0); // Vertices
+            GL.EnableVertexAttribArray(1); // Normals
+            GL.EnableVertexAttribArray(2); // TexCoords
 
-            //// Bind the .obj data using indexed drawing
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
+            // Bind the .obj data using indexed drawing
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
 
-            //// Vertex positions
-            //GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
+            // Vertex positions
+            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
 
-            //// Normals
-            //GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+            // Normals
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
 
-            //// Texture coordinates
-            //GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
+            // Texture coordinates
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
-            //// Draw using indexed vertices
-            //GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
+            // Draw using indexed vertices
+            GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
 
-            //GL.DisableVertexAttribArray(0);
-            //GL.DisableVertexAttribArray(1);
-            //GL.DisableVertexAttribArray(2);
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
 
 
             Glfw.SwapBuffers(window);
