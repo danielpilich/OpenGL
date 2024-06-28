@@ -59,7 +59,7 @@ namespace PMLabs
             GL.Enable(EnableCap.DepthTest);
 
             // Load the .obj file
-            objLoader.Load("Model/sphere2.obj");
+            objLoader.Load("Models/cube.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
