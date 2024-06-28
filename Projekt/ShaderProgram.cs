@@ -1,10 +1,8 @@
-﻿using System;
-using System.IO;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 
 namespace Shaders
 {
-    
+
     //Obiekt klasy ShaderProgram reprezentuje program cieniujący.
     //Konstruktor wczytuje źródła poszczególnych shaderów wchodzących w skład programu cieniującego, kompiluje je, linkuje i umieszcza gotowy program w pamięci karty graficznej.
     //Dodatkowe metody ułatwiają korzystanie z programu cieniujacego.
@@ -17,7 +15,7 @@ namespace Shaders
         //frag - nazwa pliku z kodem fragment shadera
         public ShaderProgram(string vert, string frag)
         {
-            Construct(vert, "", frag);            
+            Construct(vert, "", frag);
         }
 
         //vert - nazwa pliku z kodem vertex shadera
@@ -75,7 +73,7 @@ namespace Shaders
 
             //Pobierz log błędów linkowania i wyświetl
             var log = GL.GetProgramInfoLog(shaderProgram);
-           
+
             if (log.Length > 1) Console.WriteLine(log);
 
             //Po linkowaniu obiekty poszczeólnych shaderów nie są potrzebne, także je odłącz od obiektu programu cieniującego...
@@ -101,7 +99,7 @@ namespace Shaders
         {
             GL.UseProgram(shaderProgram);
         }
-        
+
 
         //Zwraca identyfikator zmiennej jednorodnej o podanej nazwie
         public int U(string name)
@@ -120,22 +118,22 @@ namespace Shaders
         //Kompiluje kod shadera określonego typu i zwraca obiekt OpenGL
         private static int LoadShader(ShaderType type, string source)
         {
-            source=System.Text.RegularExpressions.Regex.Replace(source, @"[^\u0000-\u007F]+", string.Empty);//Usuń wszystkie znaki UTF - Błąd w shadersource najprawdopobniej bierze długość łańcucha jako długość źródła a nie liczbę bajtów, więc się później sypie.
+            source = System.Text.RegularExpressions.Regex.Replace(source, @"[^\u0000-\u007F]+", string.Empty);//Usuń wszystkie znaki UTF - Błąd w shadersource najprawdopobniej bierze długość łańcucha jako długość źródła a nie liczbę bajtów, więc się później sypie.
             //Utwórz obiekt shadera
             var shader = GL.CreateShader(type);
             //Dodaj kod źródłowy shadera do obiektu
-            GL.ShaderSource(shader,source);
+            GL.ShaderSource(shader, source);
             //Kompiluj shader
             GL.CompileShader(shader);
 
             //Opcjonalnie wyświetl log błędów na konsoli
-            var log=GL.GetShaderInfoLog(shader);            
-            if (log.Length>1) Console.WriteLine(log);
+            var log = GL.GetShaderInfoLog(shader);
+            if (log.Length > 1) Console.WriteLine(log);
 
             return shader;
         }
-    
+
     }
-    
+
 }
 

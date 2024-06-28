@@ -8,6 +8,6 @@ in vec4 i_c;
 
 void main(void) {
 
-	pixelColor=i_c;
+	pixelColor=vec4(1,1,1,1);
 
 }

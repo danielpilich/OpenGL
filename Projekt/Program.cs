@@ -22,14 +22,11 @@ namespace PMLabs
         static float speed_y;
         static float speed_x;
 
-        static List<float> vertices = new List<float>();
-        static List<float> vertexNormals = new List<float>();
-        static List<float> texCoords = new List<float>();
-        static List<int> vertexIndices = new List<int>();
-        static List<int> normalIndices = new List<int>();
-        static List<int> texCoordIndices = new List<int>();
+        static ObjLoader objLoader = new ObjLoader();
+        //static Sphere sphere = new Sphere();
 
         static KeyCallback kc = KeyProcessor;
+
         public static void KeyProcessor(System.IntPtr window, Keys key, int scanCode, InputState state, ModifierKeys mods)
         {
             if (state == InputState.Press)
@@ -55,50 +52,8 @@ namespace PMLabs
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
-            string path = "Models/sphere.obj";
-
-            using (StreamReader reader = new StreamReader(path))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.StartsWith("v "))
-                    {
-                        var parts = line.Split(' ');
-                        vertices.Add(float.Parse(parts[1])); // x
-                        vertices.Add(float.Parse(parts[2])); // y
-                        vertices.Add(float.Parse(parts[3])); // z
-                        vertices.Add(1.0f);
-                    }
-                    else if (line.StartsWith("vn "))
-                    {
-                        var parts = line.Split(' ');
-                        vertexNormals.Add(float.Parse(parts[1])); // x
-                        vertexNormals.Add(float.Parse(parts[2])); // y
-                        vertexNormals.Add(float.Parse(parts[3])); // z
-                        vertexNormals.Add(1.0f);
-                    }
-                    else if (line.StartsWith("vt "))
-                    {
-                        var parts = line.Split(' ');
-                        texCoords.Add(float.Parse(parts[1]));
-                        texCoords.Add(float.Parse(parts[2]));
-                    }
-                    else if (line.StartsWith("f "))
-                    {
-                        var parts = line.Split(' ');
-                        for (int i = 1; i < parts.Length; i++)
-                        {
-                            var indices = parts[i].Split('/');
-                            vertexIndices.Add(int.Parse(indices[0]) - 1);
-                            if (indices.Length > 1 && indices[1] != "")
-                                texCoordIndices.Add(int.Parse(indices[1]) - 1);
-                            if (indices.Length > 2 && indices[2] != "")
-                                normalIndices.Add(int.Parse(indices[2]) - 1);
-                        }
-                    }
-                }
-            }
+            // Load the .obj file
+            objLoader.Load("Models/sphere.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
@@ -147,20 +102,34 @@ namespace PMLabs
             mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) * mat4.Rotate(angle_x, new vec3(1, 0, 0));
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
-            GL.EnableVertexAttribArray(shader.A("vertex"));
-            GL.EnableVertexAttribArray(shader.A("normal"));
-            GL.EnableVertexAttribArray(shader.A("texCoord"));
+            GL.Uniform4(shader.U("color"), 0.1f, 0.1f, 0.9f, 1f);
 
+            GL.EnableVertexAttribArray(0); // Vertices
+            GL.EnableVertexAttribArray(1); // Normals
+            GL.EnableVertexAttribArray(2); // TexCoords
 
-            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, vertices.ToArray());
-            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, vertexNormals.ToArray());
-            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, texCoords.ToArray());
+            // Bind the .obj data using indexed drawing
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
 
-            GL.DrawArrays(PrimitiveType.Lines, 0, vertices.Count / 4);
+            // Vertex positions
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
 
-            GL.DisableVertexAttribArray(shader.A("vertex"));
-            GL.DisableVertexAttribArray(shader.A("normal"));
-            GL.DisableVertexAttribArray(shader.A("texCoord"));
+            // Normals
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+
+            // Texture coordinates
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+
+            // Draw using indexed vertices
+            GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
 
             Glfw.SwapBuffers(window);
         }
@@ -168,7 +137,7 @@ namespace PMLabs
 
         static void Main(string[] args)
         {
-            Glfw.Init();//Zainicjuj bibliotekę GLFW
+            Glfw.Init();
 
             Window window = Glfw.CreateWindow(500, 500, "OpenGL", GLFW.Monitor.None, Window.None);
 
@@ -184,6 +153,9 @@ namespace PMLabs
 
             Glfw.Time = 0;
 
+            float angle_x = 0;
+            float angle_y = 0;
+
             while (!Glfw.WindowShouldClose(window))
             {
                 angle_x += speed_x * (float)Glfw.Time;
@@ -194,12 +166,9 @@ namespace PMLabs
                 Glfw.PollEvents();
             }
 
-
             FreeOpenGLProgram(window);
 
             Glfw.Terminate();
         }
-
-
     }
 }
