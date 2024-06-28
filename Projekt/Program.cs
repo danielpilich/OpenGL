@@ -18,12 +18,15 @@ namespace PMLabs
 
     class Program
     {
+
         static ShaderProgram shader;
         static float speed_y;
         static float speed_x;
 
         static ObjLoader objLoader = new ObjLoader();
-        //static Sphere sphere = new Sphere();
+
+        static int tex;
+        static int tex2;
 
         static KeyCallback kc = KeyProcessor;
 
@@ -49,11 +52,14 @@ namespace PMLabs
         {
             GL.ClearColor(0, 0, 0, 1);
             shader = new ShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
+            // Textures generated using LeonardoAI
+            tex = ReadTexture("Texture/earth.jpg", TextureUnit.Texture0);
+            tex2 = ReadTexture("Texture/earthLight.jpg", TextureUnit.Texture1);
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
             // Load the .obj file
-            objLoader.Load("Models/sphere.obj");
+            objLoader.Load("Model/sphere2.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
@@ -62,7 +68,7 @@ namespace PMLabs
         }
 
         //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
-        public static int ReadTexture(string filename, TextureUnit textureUnit = TextureUnit.Texture0)
+        public static int ReadTexture(string filename, TextureUnit textureUnit)
         {
             var tex = GL.GenTexture();
             GL.ActiveTexture(textureUnit);
@@ -88,44 +94,53 @@ namespace PMLabs
             return tex;
         }
 
-        public static void DrawScene(Window window, float angle_x, float angle_y)
+        public static void DrawScene(Window window, float angle_x, float angle_y, float selfRotationAngle)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             mat4 P = mat4.Perspective(glm.Radians(50.0f), 1, 1, 50);
-            mat4 V = mat4.LookAt(new vec3(0, 0, -3), new vec3(0, 0, 0), new vec3(0, 1, 0));
+            mat4 V = mat4.LookAt(new vec3(0, 0, -3), new vec3(0, 0, 0), new vec3(0, 1, 0)) *
+                 mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
+                 mat4.Rotate(angle_x, new vec3(1, 0, 0));
 
             shader.Use();
             GL.UniformMatrix4(shader.U("P"), 1, false, P.Values1D);
             GL.UniformMatrix4(shader.U("V"), 1, false, V.Values1D);
 
-            mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) * mat4.Rotate(angle_x, new vec3(1, 0, 0));
+            // Nachylenie osi obrotu
+            vec3 inclinedAxis = new vec3(1, 1, 0).Normalized;
+
+            mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
+                     mat4.Rotate(angle_x, new vec3(1, 0, 0)) *
+                     mat4.Rotate(selfRotationAngle, inclinedAxis);
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
-            GL.Uniform4(shader.U("color"), 0.1f, 0.1f, 0.9f, 1f);
+            GL.Uniform1(shader.U("tex"), 0);
+            GL.Uniform1(shader.U("tex2"), 1);
 
-            GL.EnableVertexAttribArray(0); // Vertices
-            GL.EnableVertexAttribArray(1); // Normals
-            GL.EnableVertexAttribArray(2); // TexCoords
+            //Kula
+
+            GL.EnableVertexAttribArray(shader.A("vertex")); // Vertices
+            GL.EnableVertexAttribArray(shader.A("normal")); // Normals
+            GL.EnableVertexAttribArray(shader.A("texCoord")); // TexCoords
 
             // Bind the .obj data using indexed drawing
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
 
             // Vertex positions
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
+            GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
 
             // Normals
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
 
             // Texture coordinates
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
-
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
             // Draw using indexed vertices
             GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 4);
 
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
@@ -134,10 +149,9 @@ namespace PMLabs
             Glfw.SwapBuffers(window);
         }
 
-
         static void Main(string[] args)
         {
-            Glfw.Init();
+            Glfw.Init(); // Zainicjuj bibliotekę GLFW
 
             Window window = Glfw.CreateWindow(500, 500, "OpenGL", GLFW.Monitor.None, Window.None);
 
@@ -148,6 +162,7 @@ namespace PMLabs
 
             float angle_x = 0;
             float angle_y = 0;
+            float selfRotationAngle = 0;
 
             InitOpenGLProgram(window);
 
@@ -155,10 +170,12 @@ namespace PMLabs
 
             while (!Glfw.WindowShouldClose(window))
             {
-                angle_x += speed_x * (float)Glfw.Time;
-                angle_y += speed_y * (float)Glfw.Time;
+                float time = (float)Glfw.Time;
+                angle_x += speed_x * time;
+                angle_y += speed_y * time;
+                selfRotationAngle += 1.0f * time; // Prędkość obrotu wokół nachylonej osi
                 Glfw.Time = 0;
-                DrawScene(window, angle_x, angle_y);
+                DrawScene(window, angle_x, angle_y, selfRotationAngle);
 
                 Glfw.PollEvents();
             }
