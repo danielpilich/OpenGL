@@ -4,6 +4,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Shaders;
 using System.Drawing;
+using System.Reflection;
 
 namespace PMLabs
 {
@@ -111,9 +112,7 @@ namespace PMLabs
             // Nachylenie osi obrotu
             vec3 inclinedAxis = new vec3(1, 1, 0).Normalized;
 
-            mat4 M = mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
-                     mat4.Rotate(angle_x, new vec3(1, 0, 0)) *
-                     mat4.Rotate(selfRotationAngle, inclinedAxis);
+            mat4 M = mat4.Rotate(selfRotationAngle, inclinedAxis);
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
             GL.Uniform1(shader.U("tex"), 0);
@@ -133,8 +132,10 @@ namespace PMLabs
             // Texture coordinates
             GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
+
             // Draw using indexed vertices
-            GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 4);
+            //GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
+            GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count/4);
 
             GL.DisableVertexAttribArray(shader.A("vertex"));
             GL.DisableVertexAttribArray(shader.A("normal"));
