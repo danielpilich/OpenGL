@@ -28,6 +28,9 @@
     <None Update="glfw.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Model\cube.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Model\sphere.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
