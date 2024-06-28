@@ -2,12 +2,17 @@
 
 public class ObjLoader
 {
-    public List<float> Vertices { get; private set; } = new List<float>();
-    public List<float> Normals { get; private set; } = new List<float>();
-    public List<float> TexCoords { get; private set; } = new List<float>();
+    public List<float> TempVertices { get; private set; } = new List<float>();
+    public List<float> TempNormals { get; private set; } = new List<float>();
+    public List<float> TempTexCoords { get; private set; } = new List<float>();
     public List<int> VertexIndices { get; private set; } = new List<int>();
     public List<int> NormalIndices { get; private set; } = new List<int>();
     public List<int> TexCoordIndices { get; private set; } = new List<int>();
+
+
+    public List<float> Vertices { get; private set; } = new List<float>();
+    public List<float> Normals { get; private set; } = new List<float>();
+    public List<float> TexCoords { get; private set; } = new List<float>();
 
     public void Load(string path)
     {
@@ -19,24 +24,24 @@ public class ObjLoader
                 if (line.StartsWith("v "))
                 {
                     var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    Vertices.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
-                    Vertices.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
-                    Vertices.Add(float.Parse(parts[3], CultureInfo.InvariantCulture));
-                    Vertices.Add(1.0f);
+                    TempVertices.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
+                    TempVertices.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
+                    TempVertices.Add(float.Parse(parts[3], CultureInfo.InvariantCulture));
+                    TempVertices.Add(1.0f);
                 }
                 else if (line.StartsWith("vn "))
                 {
                     var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    Normals.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
-                    Normals.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
-                    Normals.Add(float.Parse(parts[3], CultureInfo.InvariantCulture));
-                    Normals.Add(0.0f);
+                    TempNormals.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
+                    TempNormals.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
+                    TempNormals.Add(float.Parse(parts[3], CultureInfo.InvariantCulture));
+                    TempNormals.Add(0.0f);
                 }
                 else if (line.StartsWith("vt "))
                 {
                     var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    TexCoords.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
-                    TexCoords.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
+                    TempTexCoords.Add(float.Parse(parts[1], CultureInfo.InvariantCulture));
+                    TempTexCoords.Add(float.Parse(parts[2], CultureInfo.InvariantCulture));
                 }
                 else if (line.StartsWith("f "))
                 {
@@ -57,5 +62,31 @@ public class ObjLoader
                 }
             }
         }
+
+        foreach (var index in VertexIndices)
+        {
+            var test = index * 4;
+            Vertices.Add(TempVertices[test]); // x
+            Vertices.Add(TempVertices[test + 1]); // y
+            Vertices.Add(TempVertices[test + 2]); // z
+            Vertices.Add(TempVertices[test + 3]); // w
+        }
+
+        foreach (var index in NormalIndices)
+        {
+            var test = index * 4;
+            Normals.Add(TempNormals[test]);
+            Normals.Add(TempNormals[test + 1]);
+            Normals.Add(TempNormals[test + 2]);
+            Normals.Add(TempNormals[test + 3]);
+        }
+
+        foreach (var index in TexCoordIndices)
+        {
+            var test = index * 2;
+            TexCoords.Add(TempTexCoords[test]);
+            TexCoords.Add(TempTexCoords[test + 1]);
+        }
     }
 }
+

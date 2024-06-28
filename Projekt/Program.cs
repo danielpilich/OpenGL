@@ -59,12 +59,13 @@ namespace PMLabs
             GL.Enable(EnableCap.DepthTest);
 
             // Load the .obj file
-            objLoader.Load("Models/cube.obj");
+            objLoader.Load("Models/sphere3.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)
         {
-
+            GL.DeleteTexture(tex);
+            GL.DeleteTexture(tex2);
         }
 
         //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
@@ -119,28 +120,21 @@ namespace PMLabs
             GL.Uniform1(shader.U("tex2"), 1);
 
             //Kula
-
-            GL.EnableVertexAttribArray(shader.A("vertex")); // Vertices
-            GL.EnableVertexAttribArray(shader.A("normal")); // Normals
-            GL.EnableVertexAttribArray(shader.A("texCoord")); // TexCoords
-
-            // Bind the .obj data using indexed drawing
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); // Unbind any previously bound VBO
+            GL.EnableVertexAttribArray(shader.A("vertex")); // TempVertices
+            GL.EnableVertexAttribArray(shader.A("normal")); // TempNormals
+            GL.EnableVertexAttribArray(shader.A("texCoord")); // TempTexCoords
 
             // Vertex positions
             GL.VertexAttribPointer(shader.A("vertex"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Vertices.ToArray());
 
-            // Normals
-            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, objLoader.Normals.ToArray());
+            // TempNormals
+            GL.VertexAttribPointer(shader.A("normal"), 4, VertexAttribPointerType.Float, false, 0, objLoader.VertexNormals.ToArray());
 
             // Texture coordinates
             GL.VertexAttribPointer(shader.A("texCoord"), 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
             // Draw using indexed vertices
-            GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
-
-
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 4);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, objLoader.Vertices.Count / 4);
 
             GL.DisableVertexAttribArray(shader.A("vertex"));
             GL.DisableVertexAttribArray(shader.A("normal"));

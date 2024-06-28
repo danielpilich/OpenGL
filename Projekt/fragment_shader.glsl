@@ -30,6 +30,6 @@ void main(void) {
     r = reflect(-l,n);
     v = normalize(vec4(0,0,0,1) - V*M*vertex_f);
     float rv = clamp(dot(r,v),0,1);
-    rv = pow(rv,25);
+    rv = pow(rv,100);
     pixelColor = vec4(0,0,0,1)*color+vec4(1,1,1,1)*color*dot(l,n)+color2*vec4(1,1,1,1)*rv;
 }
