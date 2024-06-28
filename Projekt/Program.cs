@@ -122,8 +122,12 @@ namespace PMLabs
             // Texture coordinates
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, objLoader.TexCoords.ToArray());
 
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+
             // Draw using indexed vertices
             GL.DrawElements(PrimitiveType.Triangles, objLoader.VertexIndices.Count, DrawElementsType.UnsignedInt, objLoader.VertexIndices.ToArray());
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
 
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
