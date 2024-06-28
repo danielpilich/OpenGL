@@ -1,6 +1,5 @@
 ﻿using GLFW;
 using GlmSharp;
-using Models;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Shaders;
@@ -55,7 +54,7 @@ namespace PMLabs
             GL.Enable(EnableCap.DepthTest);
 
             // Load the .obj file
-            objLoader.Load("Model/sphere.obj");
+            objLoader.Load("Models/sphere.obj");
         }
 
         public static void FreeOpenGLProgram(Window window)

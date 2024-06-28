@@ -9,12 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\**" />
-    <EmbeddedResource Remove="Models\**" />
-    <None Remove="Models\**" />
-  </ItemGroup>
-
-  <ItemGroup>
 	<PackageReference Include="glfw-net" Version="3.3.1" />
 	<PackageReference Include="GlmSharp" Version="0.9.8" />
 	<PackageReference Include="OpenTK" Version="4.7.7" />
@@ -27,6 +21,9 @@
     </None>
     <None Update="glfw.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\sphere.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Model\cube.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
