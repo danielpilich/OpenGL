@@ -37,7 +37,10 @@
     <None Update="Texture\earth.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Texture\earthLight.jpg">
+    <None Update="Texture\earthDark.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Texture\earthLighting.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="vertex_shader.glsl">
