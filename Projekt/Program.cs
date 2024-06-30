@@ -77,21 +77,25 @@ namespace PMLabs
             GL.BindTexture(TextureTarget.Texture2D, tex);
 
             Bitmap bitmap = new Bitmap(filename);
+
+            // Flip the bitmap vertically
+            bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+
             System.Drawing.Imaging.BitmapData data = bitmap.LockBits(
-              new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-              System.Drawing.Imaging.ImageLockMode.ReadOnly,
-              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width,
-              data.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                data.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
             bitmap.UnlockBits(data);
             bitmap.Dispose();
 
             GL.TexParameter(TextureTarget.Texture2D,
-              TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D,
-              TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+                TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 
             return tex;
         }
@@ -101,18 +105,18 @@ namespace PMLabs
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             mat4 P = mat4.Perspective(glm.Radians(50.0f), 1, 1, 50);
-            mat4 V = mat4.LookAt(new vec3(0, 0, -3), new vec3(0, 0, 0), new vec3(0, 1, 0)) *
-                 mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
-                 mat4.Rotate(angle_x, new vec3(1, 0, 0));
+
+            // Update view matrix based on user input
+            mat4 V = mat4.LookAt(new vec3(2, 2, -3), new vec3(0, 0, 0), new vec3(0, 1, 0)) *
+                     mat4.Rotate(angle_y, new vec3(0, 1, 0)) *
+                     mat4.Rotate(angle_x, new vec3(1, 0, 0));
 
             shader.Use();
             GL.UniformMatrix4(shader.U("P"), 1, false, P.Values1D);
             GL.UniformMatrix4(shader.U("V"), 1, false, V.Values1D);
 
-            // Nachylenie osi obrotu
-            vec3 inclinedAxis = new vec3(1, 1, 0).Normalized;
-
-            mat4 M = mat4.Rotate(selfRotationAngle, inclinedAxis);
+            // Apply rotation to the Earth model
+            mat4 M = mat4.Rotate(selfRotationAngle, new vec3(0, 1, 0));
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
             GL.Uniform1(shader.U("tex"), 0);
@@ -166,7 +170,7 @@ namespace PMLabs
             while (!Glfw.WindowShouldClose(window))
             {
                 float time = (float)Glfw.Time;
-                angle_x += speed_x * time;
+                angle_x += speed_x * time; // Obracanie wokół osi X
                 angle_y += speed_y * time;
                 selfRotationAngle += 1.0f * time; // Prędkość obrotu wokół nachylonej osi
                 Glfw.Time = 0;
