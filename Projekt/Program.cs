@@ -155,7 +155,7 @@ namespace PMLabs
 
             GL.LoadBindings(new BC());
 
-            float angle_x = 0.0f;
+            float angle_x = 0.4f;
             float angle_y = 0.0f;
             float selfRotationAngle = 0;
 
