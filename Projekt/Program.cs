@@ -28,6 +28,7 @@ namespace PMLabs
 
         static int tex;
         static int tex2;
+        static int tex3;
 
         static KeyCallback kc = KeyProcessor;
 
@@ -55,7 +56,8 @@ namespace PMLabs
             shader = new ShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
             // Textures generated using LeonardoAI
             tex = ReadTexture("Texture/earth.jpg", TextureUnit.Texture0);
-            tex2 = ReadTexture("Texture/earthLight.jpg", TextureUnit.Texture1);
+            tex2 = ReadTexture("Texture/earthDark.jpg", TextureUnit.Texture1);
+            tex3 = ReadTexture("Texture/earthLightning2.png", TextureUnit.Texture2);
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
@@ -67,6 +69,7 @@ namespace PMLabs
         {
             GL.DeleteTexture(tex);
             GL.DeleteTexture(tex2);
+            GL.DeleteTexture(tex3);
         }
 
         //MODYFIKACJA. Ta wersja funkcji pozwala łatwo wczytać teksturę do innej jednostki teksturującej - należy ją podać jako argument.
@@ -121,6 +124,7 @@ namespace PMLabs
 
             GL.Uniform1(shader.U("tex"), 0);
             GL.Uniform1(shader.U("tex2"), 1);
+            GL.Uniform1(shader.U("tex3"), 2);
 
             //Kula
             GL.EnableVertexAttribArray(shader.A("vertex")); // TempVertices
