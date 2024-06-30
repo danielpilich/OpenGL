@@ -2,17 +2,16 @@
 
 public class ObjLoader
 {
+    public List<float> Vertices { get; private set; } = new List<float>();
+    public List<float> Normals { get; private set; } = new List<float>();
+    public List<float> TexCoords { get; private set; } = new List<float>();
+
     public List<float> TempVertices { get; private set; } = new List<float>();
     public List<float> TempNormals { get; private set; } = new List<float>();
     public List<float> TempTexCoords { get; private set; } = new List<float>();
     public List<int> VertexIndices { get; private set; } = new List<int>();
     public List<int> NormalIndices { get; private set; } = new List<int>();
     public List<int> TexCoordIndices { get; private set; } = new List<int>();
-
-
-    public List<float> Vertices { get; private set; } = new List<float>();
-    public List<float> Normals { get; private set; } = new List<float>();
-    public List<float> TexCoords { get; private set; } = new List<float>();
 
     public void Load(string path)
     {
