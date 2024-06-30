@@ -57,7 +57,7 @@ namespace PMLabs
             // Textures generated using LeonardoAI
             tex = ReadTexture("Texture/earth.jpg", TextureUnit.Texture0);
             tex2 = ReadTexture("Texture/earthDark.jpg", TextureUnit.Texture1);
-            tex3 = ReadTexture("Texture/earthLightning2.png", TextureUnit.Texture2);
+            tex3 = ReadTexture("Texture/earthLighting.png", TextureUnit.Texture2);
             Glfw.SetKeyCallback(window, kc);
             GL.Enable(EnableCap.DepthTest);
 
