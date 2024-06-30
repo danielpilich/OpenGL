@@ -118,8 +118,15 @@ namespace PMLabs
             GL.UniformMatrix4(shader.U("P"), 1, false, P.Values1D);
             GL.UniformMatrix4(shader.U("V"), 1, false, V.Values1D);
 
-            // Apply rotation to the Earth model
-            mat4 M = mat4.Rotate(selfRotationAngle, new vec3(0, 1, 0));
+            // Apply tilt to the Earth model
+            float earthTiltAngle = glm.Radians(23.5f); // Tilt angle in radians
+            mat4 tiltMatrix = mat4.Rotate(earthTiltAngle, new vec3(1, 0, 0));
+
+            // Apply self-rotation around the tilted y-axis
+            mat4 selfRotationMatrix = mat4.Rotate(selfRotationAngle, new vec3(0, 1, 0));
+
+            // Combine the tilt and self-rotation
+            mat4 M = tiltMatrix * selfRotationMatrix;
             GL.UniformMatrix4(shader.U("M"), 1, false, M.Values1D);
 
             GL.Uniform1(shader.U("tex"), 0);
@@ -163,7 +170,7 @@ namespace PMLabs
 
             GL.LoadBindings(new BC());
 
-            float angle_x = 0.4f;
+            float angle_x = 0.0f;
             float angle_y = 0.0f;
             float selfRotationAngle = 0;
 
